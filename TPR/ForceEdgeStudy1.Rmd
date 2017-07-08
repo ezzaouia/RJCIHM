@@ -1,0 +1,43 @@
+---
+title: "ForeEdgeStudy1"
+author: "RJCIHM"
+date: "2017"
+output: html_document
+---
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+```
+
+## Chargement des données
+
+
+```{r readdata}
+forceEdge = read.table("ForceEdgeStudy1.csv", header=TRUE, sep=",")
+forceEdge$participant = factor(forceEdge$participant)
+forceEdge$task = factor(forceEdge$task)
+forceEdge$technique = factor(forceEdge$technique)
+forceEdge$block = factor(forceEdge$block)
+forceEdge$distance = factor(forceEdge$distance)
+forceEdge$repetition = factor(forceEdge$repetition)
+forceEdge$trial = factor(forceEdge$trial)
+forceEdge$timeOfDrag = factor(forceEdge$timeOfDrag)
+forceEdge$maxOvershoot = factor(forceEdge$maxOvershoot)
+forceEdge$trialSuccess = factor(forceEdge$trialSuccess)
+```
+
+```{subset trialSuccess == 'True' }
+forceEdge = subset(forceEdge, forceEdge$trialSuccess=='True')
+```
+
+```{r showdata, echo = FALSE, results = 'asis'}
+kable(forceEdge) 
+```
+
+# Graphique

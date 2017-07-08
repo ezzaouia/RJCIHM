@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Devices\"\nauthor: \"Géry Casiez\"\ndate: \"2017\"\noutput: html_document\n---\n---\n#output:\n  #html_document: default\n  #pdf_document: default\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\nlibrary(knitr)\nlibrary(fcuk)\n```\n\n## Chargement des données\n\n```{r readdata}\ndata = read.table(\"devices.csv\", header=TRUE, sep=\",\")\n```\n\n```{r showdata, echo = FALSE, results = 'asis'}\nkable(data) \n```\n\n# Moyenne et écart-type\n\n```{r moy}\nmean(data[,\"souris\"])\nmean(data[,\"tablette\"])\n```\n\n```{r sd}\nsd(data[,\"souris\"])\nsd(data[,\"tablette\"])\n```\n\n# Graphique\n```{r plot, message=FALSE, warning=FALSE}\nlibrary(\"gplots\")\nbarplot2(c(data[,\"souris\"]), names.arg = data[,\"participant\"], plot.grid = TRUE, ylab = \"Temps (s)\", xlab = \"Participants\")\nbarplot2(c(mean(data[,\"souris\"]), mean(data[,\"tablette\"])), names.arg = c(\"souris\", \"tablette\"), plot.grid = TRUE, ylab = \"Temps (s)\", xlab = \"Peripherique\")\n```\n\n# Ré-arrangement des données\nBut: fusionner les colonnes *naturel* et *abstrait* pour créer une colonne temps et ajouter une colonne *type*.\n\n```{r onecol, results=\"hide\"}\nd1 <- data[c(\"participant\",\"souris\")]\nd1[\"peripherique\"] = \"souris\"\ncolnames(d1)[2] <- \"temps\"\nd2 <- data[c(\"participant\",\"tablette\")]\nd2[\"peripherique\"] = \"tablette\"\ncolnames(d2)[2] <- \"temps\"\nd3 <- rbind(d1,d2)\nd3 <- d3[,c(1,3,2)]\n```\n\n```{r showdata2, echo = FALSE, results = 'asis'}\nkable(d3)\n```\n\n## ANOVA\n\nConversion des données au format long\n```{r convertlong, results=\"hide\"}\nlibrary(\"reshape\")\ndata.long = melt(d3, id = c(\"participant\",\"peripherique\",\"temps\"))\n```\n\nOn précise les variables indépendantes (facteurs)\n```{r indepvar, results=\"hide\"}\ndata.long$peripherique = factor(data.long$peripherique)\n```\n\nANOVA\n```{r anova}\nlibrary(\"ez\")\nkable(ezANOVA(data.long, dv=.(temps), wid=.(participant), within=.(peripherique)))\n```\n\nAnalyse post-hoc avec ajustement de Bonferroni\n```{r posthoc}\nattach(data.long)\nprint(pairwise.t.test(temps, interaction(peripherique), p.adj = \"bonferroni\"))\ndetach(data.long)\n```\n\n## Graphique avec intervalles de confiance\n\n```{r plotci}\nlibrary(\"gmodels\")\nci_naturel = ci(data[,\"souris\"])\nci_abstrait = ci(data[,\"tablette\"])\nci_lower = c(ci_naturel[\"CI lower\"], ci_abstrait[\"CI lower\"])\nci_upper = c(ci_naturel[\"CI upper\"], ci_abstrait[\"CI upper\"])\nbarplot2(c(mean(data[,\"souris\"]), mean(data[,\"tablette\"])), names.arg = c(\"souris\", \"tablette\"), plot.grid = TRUE, plot.ci = TRUE, ci.l = ci_lower, ci.u = ci_upper , ylab = \"Temps (ms)\", xlab = \"Peripherique\")\n```",
+    "created" : 1499503567165.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1590760193",
+    "id" : "83436657",
+    "lastKnownWriteTime" : 1499509088,
+    "last_content_update" : 1499509088202,
+    "path" : "~/Code/RJCIHM/TPR/devices.Rmd",
+    "project_path" : "devices.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
